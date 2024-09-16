@@ -6,7 +6,7 @@ namespace casd_lab
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello");
+            Console.WriteLine("Hello!");
         }
     }
 }
