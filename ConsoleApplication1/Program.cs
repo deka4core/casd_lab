@@ -134,10 +134,6 @@ namespace ConsoleApplication1
             Console.WriteLine("Минимум: " + minHeap.GetExtreme());
             Console.WriteLine("Удаление минимума: " + minHeap.RemoveExtreme());
             Console.WriteLine("Новый минимум: " + minHeap.GetExtreme());
-            minHeap.Add(5);
-            Console.WriteLine("Добавление 5, новый минимум: " + minHeap.GetExtreme());
-            minHeap.ChangeKey(1, 12);
-            Console.WriteLine("Уменьшение ключа на индексе 1 до 12, новый минимум: " + minHeap.GetExtreme());
         }
     }
 }
