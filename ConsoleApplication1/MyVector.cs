@@ -10,7 +10,7 @@ namespace ConsoleApplication1
         private T[] _elementData;
         private int _elementCount;
         private readonly int _capacityIncrement;
-        
+
         public MyVector()
         {
             _elementData = new T[10];
@@ -44,8 +44,8 @@ namespace ConsoleApplication1
             _elementCount = initialCapacity;
             this._capacityIncrement = capacityIncrement;
         }
-        
-        private void Add(T e)
+
+        public void Add(T e)
         {
             if (_elementCount == _elementData.Length)
             {
@@ -71,7 +71,7 @@ namespace ConsoleApplication1
             _elementCount = 0;
         }
 
-        private bool Contains(object o)
+        public bool Contains(object o)
         {
             for (int i = 0; i < _elementCount; i++)
             {
@@ -88,7 +88,7 @@ namespace ConsoleApplication1
             return a.All(e => Contains(e));
         }
         
-        private void Resize(int newCapacity)
+        public void Resize(int newCapacity)
         {
             var newArray = new T[newCapacity];
             Array.Copy(_elementData, newArray, _elementCount);
@@ -100,7 +100,7 @@ namespace ConsoleApplication1
             return _elementCount == 0;
         }
         
-        private bool Remove(T o)
+        public bool Remove(T o)
         {
             for (int i = 0; i < _elementCount; i++)
             {
@@ -152,7 +152,7 @@ namespace ConsoleApplication1
             Array.Copy(_elementData, a, _elementCount);
             return a;
         }
-        
+
         public void Add(int index, T e)
         {
             if (index < 0 || index > _elementCount)
@@ -219,7 +219,7 @@ namespace ConsoleApplication1
             return -1;
         }
 
-        private T Remove(int index)
+        public T Remove(int index)
         {
             if (index < 0 || index >= _elementCount)
             {
@@ -246,7 +246,7 @@ namespace ConsoleApplication1
             return oldElement;
         }
         
-        private void EnsureCapacity(int min)
+        public void EnsureCapacity(int min)
         {
             if (_elementData.Length >= min) return;
             int newCapacity;
@@ -301,7 +301,7 @@ namespace ConsoleApplication1
         {
             try
             {
-                this.Remove(pos);
+                Remove(pos);
             }
             catch (Exception e)
             {
@@ -315,7 +315,7 @@ namespace ConsoleApplication1
             {
                 for (int i = begin; i < end; i++)
                 {
-                    this.Remove(i);
+                    Remove(i);
                 }
             }
             catch (Exception e)
