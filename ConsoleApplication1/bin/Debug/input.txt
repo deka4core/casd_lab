@@ -1,23 +1,11 @@
-﻿<html>
-<head>
-<title>Test Document</title>
-</head>
-<body>
-<h1>Welcome to the Test Page</h1>
-<p>This is a paragraph.</p>
-<div>
-    <p>Another paragraph.</p>
-    <br />
-    <PrIvet>Привет мир!</PrIvet>
-</div>
-<!-- This is a comment -->
-<footer>
-    <html>Nested HTML tag</html>
-</footer>
-</body>
-</html>
-</H1>
-<Div>Some DIV content</Div>
-<BR>
-<br />
-</p>
+﻿192.168.1.1 some random text
+Invalid IP 256.100.50.25
+Another line with IP 10.0.0.255
+This is not an IP 192.168.01.1
+Correct IPs: 172.16.254.1 172.16.254.01
+Check this one: 192.168.0.256
+Just a number: 1234
+Valid IP: 8.8.8.8
+0.0.0.0 is also valid
+Leading zero: 01.02.03.04
+Correct IP with zeros: 10.0.0.1
