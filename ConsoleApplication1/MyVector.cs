@@ -4,26 +4,25 @@ using System.Linq;
 
 namespace ConsoleApplication1
 {
-
     public class MyVector<T>
     {
-        private T[] _elementData;
+        private MyArrayList<T> _elementData;
         private int _elementCount;
         private readonly int _capacityIncrement;
         
         public MyVector()
         {
-            _elementData = new T[10];
+            _elementData = new MyArrayList<T>(10);
             _elementCount = 0;
             _capacityIncrement = 0;
         }
         
         public MyVector(IReadOnlyList<T> a)
         {
-            _elementData = new T[a.Count];
+            _elementData = new MyArrayList<T>(a.Count);
             for(var i = 0; i < a.Count; i++)
             {
-                _elementData[i] = a[i];
+                _elementData.Set(i, a[i]);
             }
             _capacityIncrement = 0;
         }
@@ -33,12 +32,11 @@ namespace ConsoleApplication1
             if (initialCapacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(initialCapacity),
                     "Ёмкость не может быть отрицательной.");
-            _elementData = new T[initialCapacity];
+            _elementData = new MyArrayList<T>(initialCapacity);
             _elementCount = 0;
             _capacityIncrement = 0;
         }
         
-        //new
         public MyVector(int initialCapacity, int capacityIncrement)
         {
             _elementCount = initialCapacity;
@@ -47,14 +45,14 @@ namespace ConsoleApplication1
         
         public void Add(T e)
         {
-            if (_elementCount == _elementData.Length)
+            if (_elementCount == _elementData.Size())
             {
                 if(_capacityIncrement != 0)
-                    Resize(_elementData.Length + _capacityIncrement);
+                    Resize(_elementData.Size() + _capacityIncrement);
                 else
-                    Resize(_elementData.Length * 2);
+                    Resize(_elementData.Size() * 2);
             }
-            _elementData[_elementCount++] = e;
+            _elementData.Set(_elementCount++, e);
         }
 
         public void AddAll(IEnumerable<T> a)
@@ -67,7 +65,7 @@ namespace ConsoleApplication1
         
         public void Clear()
         {
-            Array.Clear(_elementData, 0, _elementCount);
+            _elementData.Clear();
             _elementCount = 0;
         }
 
@@ -75,7 +73,7 @@ namespace ConsoleApplication1
         {
             for (int i = 0; i < _elementCount; i++)
             {
-                if (_elementData[i]?.Equals(o) == true)
+                if (_elementData.Get(i)?.Equals(o) == true)
                 {
                     return true;
                 }
@@ -90,8 +88,8 @@ namespace ConsoleApplication1
         
         public void Resize(int newCapacity)
         {
-            var newArray = new T[newCapacity];
-            Array.Copy(_elementData, newArray, _elementCount);
+            var newArray = new MyArrayList<T>(newCapacity);
+            _elementData.Resize(newCapacity);
             _elementData = newArray;
         }
         
@@ -104,7 +102,7 @@ namespace ConsoleApplication1
         {
             for (int i = 0; i < _elementCount; i++)
             {
-                if (!Equals(_elementData[i], o)) continue;
+                if (!Equals(_elementData.Get(i), o)) continue;
                 Remove(i);
                 return true;
             }
@@ -123,7 +121,7 @@ namespace ConsoleApplication1
         {
             for (int i = _elementCount - 1; i >= 0; i--)
             {
-                if (Array.IndexOf(a, _elementData[i]) == -1)
+                if (Array.IndexOf(a, _elementData.Get(i)) == -1)
                 {
                     Remove(i);
                 }
@@ -138,19 +136,12 @@ namespace ConsoleApplication1
         
         public T[] ToArray()
         {
-            var result = new T[_elementCount];
-            Array.Copy(_elementData, result, _elementCount);
-            return result;
+            return _elementData.ToArray();
         }
         
         public T[] ToArray(T[] a)
         {
-            if (a == null || a.Length < _elementCount)
-            {
-                a = new T[_elementCount];
-            }
-            Array.Copy(_elementData, a, _elementCount);
-            return a;
+            return _elementData.ToArray(a);
         }
         
         public void Add(int index, T e)
@@ -162,9 +153,9 @@ namespace ConsoleApplication1
             EnsureCapacity(_elementCount + 1);
             for (int i = _elementCount; i > index; i--)
             {
-                _elementData[i] = _elementData[i - 1];
+                _elementData.Set(i, _elementData.Get(i - 1));
             }
-            _elementData[index] = e;
+            _elementData.Set(index, e);
             _elementCount++;
         }
 
@@ -177,11 +168,11 @@ namespace ConsoleApplication1
             EnsureCapacity(_elementCount + a.Length);
             for (int i = _elementCount - 1; i >= index; i--)
             {
-                _elementData[i + a.Length] = _elementData[i];
+                _elementData.Set(i + a.Length, _elementData.Get(i));
             }
             for (int j = 0; j < a.Length; j++)
             {
-                _elementData[index + j] = a[j];
+                _elementData.Set(index + j, a[j]);
             }
             _elementCount += a.Length;
         }
@@ -192,14 +183,14 @@ namespace ConsoleApplication1
             {
                 throw new IndexOutOfRangeException("Индекс вне допустимых значений");
             }
-            return _elementData[index];
+            return _elementData.Get(index);
         }
         
         public int IndexOf(T o)
         {
             for (int i = 0; i < _elementCount; i++)
             {
-                if (Equals(_elementData[i], o))
+                if (Equals(_elementData.Get(i), o))
                 {
                     return i;
                 }
@@ -211,7 +202,7 @@ namespace ConsoleApplication1
         {
             for (int i = _elementCount - 1; i >= 0; i--)
             {
-                if (Equals(_elementData[i], o))
+                if (Equals(_elementData.Get(i), o))
                 {
                     return i;
                 }
@@ -225,12 +216,12 @@ namespace ConsoleApplication1
             {
                 throw new IndexOutOfRangeException("Индекс вне допустимых значений");
             }
-            var removedElement = _elementData[index];
+            var removedElement = _elementData.Get(index);
             for (int i = index; i < _elementCount - 1; i++)
             {
-                _elementData[i] = _elementData[i + 1];
+                _elementData.Set(i, _elementData.Get(i + 1));
             }
-            _elementData[_elementCount - 1] = default(T);
+            _elementData.Set(_elementCount - 1, default(T));
             _elementCount--;
             return removedElement;
         }
@@ -241,23 +232,14 @@ namespace ConsoleApplication1
             {
                 throw new IndexOutOfRangeException("Индекс вне допустимых значений");
             }
-            var oldElement = _elementData[index];
-            _elementData[index] = e;
+            var oldElement = _elementData.Get(index);
+            _elementData.Set(index, e);
             return oldElement;
         }
         
         public void EnsureCapacity(int min)
         {
-            if (_elementData.Length >= min) return;
-            int newCapacity;
-            if (_capacityIncrement !=  0)
-                newCapacity = _elementData.Length + _capacityIncrement;
-            else
-                newCapacity = _elementData.Length * 2;
-            if (newCapacity < min) newCapacity = min;
-            var newArray = new T[newCapacity];
-            Array.Copy(_elementData, newArray, _elementCount);
-            _elementData = newArray;
+            _elementData.EnsureCapacity(min);
         }
         
         public MyVector<T> SubList(int fromIndex, int toIndex)
@@ -268,7 +250,7 @@ namespace ConsoleApplication1
             var sublist = new MyVector<T>();
             for (int i = fromIndex; i < toIndex; i++)
             {
-                sublist.Add(_elementData[i]);
+                sublist.Add(_elementData.Get(i));
             }
             return sublist;
         }
@@ -277,7 +259,7 @@ namespace ConsoleApplication1
         {
             try
             {
-                return _elementData[0];
+                return _elementData.Get(0);
             }
             catch (Exception e)
             {
@@ -289,7 +271,7 @@ namespace ConsoleApplication1
         {
             try
             {
-                return _elementData[_elementCount - 1];
+                return _elementData.Get(_elementCount - 1);
             }
             catch (Exception e)
             {
