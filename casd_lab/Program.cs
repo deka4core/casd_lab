@@ -1,92 +1,216 @@
-﻿/* Задача 1. Описать метод, находящий длину 𝑥 вектора в 𝑁-мерном пространстве. Пространство 
-задаётся матрицей метрического тензора 𝐺 (если интересно, то можно почитать, что это, 
-если нет, то нет). Матрица 𝐺 должна быть симметричной, её размерность совпадает с 
-размерностью пространства. Нахождение длины: √𝑥 × 𝐺 × 𝑥
-𝑇. Размерность пространства, 
-матрица тензора и вектор вводятся из файла. Память выделяется динамически; проверка 
-на то, что матрица симметрична – необходима. Результат выводится на экран.
-*/
 using System;
-using System.IO;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
-namespace casd_lab
+namespace ca4
 {
-    internal class Program
+    public abstract class Calculator
     {
-        public static void Main(string[] args) {
-            const string inputFilePath = "input.txt"; // Входной файл
-
-            ReadInput(inputFilePath, out var dim, out var matrixG, out var x);
-
-            if (!IsSymmetric(matrixG)) {
-                Console.WriteLine("Матрица тензора G не является симметричной.");
-                return;
+        public static double SwitchExpression(string sign, double a, double b)
+        {
+            switch (sign)
+            {
+                case "+":
+                    return a + b;
+                case "-":
+                    return a - b;
+                case "*":
+                    return a * b;
+                case "/":
+                    return a / b;
+                case "^":
+                    return Math.Pow(a, b);
+                case "√":
+                    return Math.Sqrt(a);
+                case "sin":
+                    return Math.Sin(a);
+                case "cos":
+                    return Math.Cos(a);
+                case "tan":
+                    return Math.Tan(a);
+                case "ln" when a <= 0:
+                    throw new ArgumentException();
+                case "ln":
+                    return Math.Log(a);
+                case "log" when a <= 0:
+                    throw new ArgumentException();
+                case "log":
+                    return Math.Log10(a);
+                case "min":
+                    return Math.Min(a, b);
+                case "max":
+                    return Math.Max(a, b);
+                case "%":
+                    return a % b;
+                case "//":
+                    return (int)(a / b);
+                case "exp":
+                    return Math.Exp(1);
+                default:
+                    return 0;
             }
-
-            double length = CalculatorLength(matrixG, x);
-            Console.WriteLine($"Длина вектора: {length}");
         }
 
-        private static void ReadInput(string filePath, out int dim, out double[,] matrixG, out double[] x) {
-            var reader = new StreamReader(filePath);
-            dim = Convert.ToInt32(reader.ReadLine()); // размерность матрицы
-            matrixG = new double[dim, dim]; // Матрица тензора G
-            
-            for (var i = 0; i < dim; i++){ // Ввод матрицы тензора G
-                var row = reader.ReadLine()?.Split();
-                for (var j = 0; j < dim; j++)
-                {
-                    if (row != null) matrixG[i, j] = Convert.ToDouble(row[j]);
-                }
-            }
-            
-            x = new double[dim];
-            var vecRow = reader.ReadLine()?.Split();
-            for (var i = 0; i < dim; i++) // Ввод вектора x
-            {
-                if (vecRow != null) x[i] = Convert.ToDouble(vecRow[i]);
-            }
-        }
+        private static readonly string[] Operators = { "+", "-", "*", "/", "^", "√", "sin", "cos", "tan", "ln", "log", "min", "max", "%", "//", "(", ")" };
+        private const string NumberPattern = @"^-?\d+(\.\d+)?$";
 
-        private static bool IsSymmetric(double[,] matrix)
-        { // Метод проверки матрицы на симметричность
-            int n = matrix.GetLength(0); // длина строки
-            for (int i = 0; i < n; i++)
+        private static void Parse(string expression, out MyStack<double> numbers, out MyStack<string> signs)
+        {
+            numbers = new MyStack<double>();
+            signs = new MyStack<string>();
+
+            var tokens = expression.Split(' ');
+            foreach (var token in tokens)
             {
-                for (int j = 0; j < n; j++)
+                try
                 {
-                    if (Math.Abs(matrix[i, j] - matrix[j, i]) > 0) // иначе числа различны
+                    if (Array.Find(Operators, op => op.Equals(token)) != null)
                     {
-                        return false;
+                        signs.Push(token);
+                    }
+                    else if (token == "exp")
+                    {
+                        numbers.Push(Math.Exp(1));
+                    }
+                    else if (Regex.Matches(token, NumberPattern).Count > 0)
+                    {
+                        double.TryParse(token, NumberStyles.Any, CultureInfo.InvariantCulture, out var a);
+                        numbers.Push(a);
+                    }
+                    else
+                    {
+                        var flag = token.All(char.IsLetter);
+                        if (!flag) continue;
+                        Console.WriteLine("Введите " + token + ": ");
+                        try
+                        {
+                            var n = Console.ReadLine();
+                            numbers.Push(Convert.ToDouble(n));
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(token + " не число.");
+                        }
+                    }
+                }
+                catch 
+                {
+                    Console.WriteLine("Ввели некорректное выражение. Разделите все операции, числа и скобки пробелами. Вместо , в дробном числе введите .");
+                }
+
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+            Console.OutputEncoding = Encoding.GetEncoding(1251);
+            while (true)
+            {
+                {
+                    Console.WriteLine("Введите математическое выражение, разделяя все части выражения пробелом:");
+                    var expression = Console.ReadLine();
+                    try
+                    {
+                        Parse(expression, out var numbers, out var signs);
+                        var result = Calculate(numbers, signs);
+                        Console.WriteLine(result);
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка: {ex.Message}");
                     }
                 }
             }
-            return true;
         }
-
-        private static double CalculatorLength(double[,] matrixG, double[] x)
+        
+        private static double Calculate(MyStack<double> numbers, MyStack<string> signs)
         {
-            int dim = x.Length;
-            double result = 0;
-            double[] temp = new double[dim];
-
-            // G * x
-            for (int i = 0; i < dim; i++)
+            while (!signs.Empty() && !numbers.Empty())
             {
-                temp[i] = 0;
-                for (int j = 0; j < dim; j++)
+                try
                 {
-                    temp[i] += matrixG[i, j] * x[j];
+                    var sign = signs.Pop();
+                    if (sign == ")")
+                    {
+                        numbers.Push(Calculate(numbers, signs));
+                    }
+                    else if (sign == "(")
+                        break;
+                    else
+                        numbers.Push(Switch(sign, numbers));
+                }
+                catch (Exception ex) 
+                { 
+                    Console.WriteLine($"Ошибка: {ex.Message}");
                 }
             }
+            return numbers.Pop();
+        }
 
-            // (G * x) * x^T
-            for (int i = 0; i < dim; i++)
+        private static double Switch(string sign, MyStack<double> numbers)
+        {
+            switch (sign)
             {
-                result += x[i] * temp[i];
+                case "+":
+                    return numbers.Pop() + numbers.Pop();
+                case "-":
+                    return -1 * (numbers.Pop() - numbers.Pop());
+                case "*":
+                    return numbers.Pop() * numbers.Pop();
+                case "/":
+                {
+                    var a = numbers.Pop();
+                    var b = numbers.Pop();
+                    return b / a;
+                }
+                case "^":
+                {
+                    var a = numbers.Pop();
+                    var b = numbers.Pop();
+                    return Math.Pow(b, a);
+                }
+                case "√":
+                    return Math.Sqrt(numbers.Pop());
+                case "sin":
+                    return Math.Sin(numbers.Pop());
+                case "cos":
+                    return Math.Cos(numbers.Pop());
+                case "tan":
+                    return Math.Tan(numbers.Pop());
+                case "ln":
+                {
+                    var a = numbers.Pop();
+                    if (a <= 0) throw new ArgumentException();
+                    return Math.Log(a);
+                }
+                case "log":
+                {
+                    var a = numbers.Pop();
+                    if (a <= 0) throw new ArgumentException();
+                    return Math.Log10(a);
+                }
+                case "min":
+                    return Math.Min(numbers.Pop(), numbers.Pop());
+                case "max":
+                    return Math.Max(numbers.Pop(), numbers.Pop());
+                case "%":
+                {
+                    var a = numbers.Pop();
+                    var b = numbers.Pop();
+                    return b % a;
+                }
+                case "//":
+                {
+                    var a = numbers.Pop();
+                    var b = numbers.Pop();
+                    return (int)b / a;
+                }
+                default:
+                    return 0;
             }
-
-            return Math.Sqrt(result);
         }
     }
 }
