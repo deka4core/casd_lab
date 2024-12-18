@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,15 +16,17 @@ namespace ConsoleApp1
 {
     public partial class Graph : Form
     {
-        private readonly ZedGraphControl _zedGraphControl2;
-        private int _indexChapter = 0;
-        private int _size = 0;
-        private readonly List<string> _names = new List<string>();
-        private readonly List<string> _chapters = new List<string>();
-        private readonly Color[] _color = { Color.Red, Color.RoyalBlue, Color.DarkCyan, Color.Green, Color.Yellow, Color.Purple, Color.Black };
-        private readonly Button _button;
+        private ZedGraphControl _zedGraphControl2;
+        int indexChapter = 0;
+        int _indexName = 0;
+        int indexColor = 0;
+        int size = 0;
+        List<string> _names = new List<string>();
+        List<string> chapters = new List<string>();
+        Color[] color = { Color.Coral, Color.PowderBlue, Color.RoyalBlue, Color.SpringGreen, Color.YellowGreen, Color.Violet, Color.Teal };
+        Button button;
 
-        public Graph(int a, int b, int size, IReadOnlyList<double> x, IReadOnlyList<long[]> y)
+        public Graph(int a, int b, int size_, double[] x, long[][] y)
         {
             switch (a)
             {
@@ -49,64 +51,61 @@ namespace ConsoleApp1
                     _names.Add("Bucker");
                     _names.Add("Radiax");
                     break;
-                default:
-                    break;
             }
             switch (b)
             {
                 case 1:
-                    _chapters.Add("Массивы случайных чисел по модулю 1000");
+                    chapters.Add("Массивы случайных чисел по модулю 1000");
                     break;
                 case 2:
-                    _chapters.Add("Массивы, разбитые на несколько отсортированных подмассивов разного размера");
+                    chapters.Add("Массивы, разбитые на несколько отсортированных подмассивов разного размера");
                     break;
                 case 3:
-                    _chapters.Add("Изначально отсортированные массивы случайных чисел с некоторым числом перестановок двух случайных элементов");
+                    chapters.Add("Изначально отсортированные массивы случайных чисел с некоторым числом перестановок двух случайных элементов");
                     break;
                 case 4:
-                    _chapters.Add("Полностью отсортированные массивы в прямом порядке");
-                    _chapters.Add("Полностью отсортированные массивы в обратном порядке");
-                    _chapters.Add("Полностью отсортированные массивы с несколькими заменёнными элементами");
-                    _chapters.Add("Полностью отсортированные массивы с большим количеством повторений одного элемента");
+                    chapters.Add("Полностью отсортированные массивы в прямом порядке");
+                    chapters.Add("Полностью отсортированные массивы в обратном порядке");
+                    chapters.Add("Полностью отсортированные массивы с несколькими заменёнными элементами");
+                    chapters.Add("Полностью отсортированные массивы с большим количеством повторений одного элемента");
                     break;
                 default:
-                    _chapters.Add("Массивы случайных чисел по модулю 1000");
+                    chapters.Add("Массивы случайных чисел по модулю 1000");
                     break;
             }
 
             _zedGraphControl2 = new ZedGraphControl { Dock = DockStyle.Fill };
             this.Controls.Add(_zedGraphControl2);
             var graphPane = _zedGraphControl2.GraphPane;
-            if (_chapters != null)
+            if (chapters != null)
             {
-                graphPane.Title.Text = _chapters[0].ToString();
-                _indexChapter++;
+                graphPane.Title.Text = chapters[0].ToString();
+                indexChapter++;
             }
             graphPane.XAxis.Title.Text = "Ось X";
             graphPane.YAxis.Title.Text = "Ось Y";
 
-            for (var i = 0; i < y.Count; i++)
+            for (var i = 0; i < y.Length; i++)
             {
                 var points = new PointPairList();
                 for(var j = 0; j != y[i].Length; j++)
                 {
                     points.Add(x[j], y[i][j]);
                 }
-                var lineItem = graphPane.AddCurve(_names[i], points, _color[i], SymbolType.Circle);
-
+                var lineItem = graphPane.AddCurve(_names[i], points, color[i], SymbolType.Circle);
+                
                 lineItem.Line.Width = 2.0f;
                 lineItem.Line.SmoothTension = 0.5f;
                 lineItem.Symbol.Size = 6;
             }
-            
             InitializeComponent();
             _zedGraphControl2.AxisChange();
             _zedGraphControl2.Invalidate();
-            _button = new Button();
-            _button.Text = @"Save to file";
-            this.Controls.Add(_button);
-            _button.BringToFront();
-            _button.Click += button1_MouseClick;
+            button = new Button();
+            button.Text = @"Save to file";
+            this.Controls.Add(button);
+            button.BringToFront();
+            button.Click += button1_MouseClick;
 
 
         }
