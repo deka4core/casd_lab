@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,40 +10,53 @@ using System.Windows.Forms;
 
 namespace ConsoleApp1
 {
+    public class NonZeroComparer : IComparer<int>
+    {
+        public int Compare(int x, int y)
+        {
+            if (x > y) return 1;
+            if (x == y) return 0;
+            if (x < y) return -1;
+            return -1;
+        }
+    }
     public partial class Menu : Form
     {
-        private bool _firstCombobox = false;
-        private bool _secondCombobox = false;
-        private bool _genArrButton = false;
-        private readonly Test _test;
+        
+        bool firstCombox = false;
+        bool secondCombox = false;
+        bool genArrButton = false;
+        Comparison<int> comparer = (x, y) => new NonZeroComparer().Compare(x, y);
+
+        Test<int> test;
         public Menu()
         {
-            _test = new Test();
+            test = new Test<int>();
             InitializeComponent();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (!_firstCombobox || !_secondCombobox || !_genArrButton) return;
-            _test.StartTest();
+            if (!firstCombox || !secondCombox || !genArrButton) return;
+            test.StartTest(comparer);
             Close();
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _secondCombobox = true;
+            secondCombox = true;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _firstCombobox = true;
+            firstCombox = true;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (_genArrButton != false || _firstCombobox != true || _secondCombobox != true) return;
-            _test.InitialTest(comboBox1.SelectedIndex, comboBox2.SelectedIndex);
-            _genArrButton = true;
+            if (genArrButton || firstCombox != true || secondCombox != true) return;
+            test.InitialTest(comboBox1.SelectedIndex, comboBox2.SelectedIndex, 0, 1000, comparer);
+            genArrButton = true;
         }
     }
 }
