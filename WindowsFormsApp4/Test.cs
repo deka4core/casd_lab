@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -6,156 +6,149 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
-    internal class Test
+    class Test<T>
     {
-        private static int[][] _array1 = null;
-        private static int[][] _array2 = null;
-        private static int[][] _array3 = null;
-        private static int[][] _array4 = null;
-        
-        private delegate void GroupDelegate(int[] array);
+        private static T[][] array1 = null;
+        private static T[][] array2 = null;
+        private static T[][] array3 = null;
+        private static T[][] array4 = null;
 
-        private readonly List<GroupDelegate> _firstGroup = new List<GroupDelegate>
+        public delegate void GroupDelegate(T[] array, Comparison<T> comparer);
+
+        List<GroupDelegate> firstGroup = new List<GroupDelegate>
         {
-            SortingAlgorithms.BubbleSort,
-            SortingAlgorithms.InsertionSort,
-            SortingAlgorithms.SelectionSort,
-            SortingAlgorithms.ShakerSort,
-            SortingAlgorithms.GnomeSort
+            SortingAlgorithms<T>.BubbleSort,      
+            SortingAlgorithms<T>.InsertionSort,   
+            SortingAlgorithms<T>.SelectionSort,   
+            SortingAlgorithms<T>.ShakerSort,      
+            SortingAlgorithms<T>.GnomeSort,       
         };
 
-        private readonly List<GroupDelegate> _secondGroup = new List<GroupDelegate>
+        List<GroupDelegate> secondGroup = new List<GroupDelegate>
         {
-            SortingAlgorithms.BitonicSort,
-            SortingAlgorithms.ShellSort,
-            SortingAlgorithms.TreeSort
+            SortingAlgorithms < T >.BitonicSort,     
+            SortingAlgorithms < T >.ShellSort,       
+            SortingAlgorithms < T >.TreeSort,        
+        };
+        List<GroupDelegate> thirdGroup = new List<GroupDelegate>
+        {
+            SortingAlgorithms < T >.CombSort,        
+            SortingAlgorithms < T >.HeapSort,        
+            SortingAlgorithms < T >.QuickSort,       
+            SortingAlgorithms < T >.MergeSort,       
+            SortingAlgorithms < T >.CountingSort,    
+            SortingAlgorithms < T >.BucketSort
         };
 
-        private readonly List<GroupDelegate> _thirdGroup = new List<GroupDelegate>
-        {
-            SortingAlgorithms.CombSort,
-            SortingAlgorithms.HeapSort,
-            SortingAlgorithms.QuickSort,
-            SortingAlgorithms.MergeSort,
-            SortingAlgorithms.CountingSort,
-            SortingAlgorithms.BucketSort,
-            SortingAlgorithms.RadiaxSort
-        };
-        
-        private delegate int[] TestDataDelegate(ref int size, int modulus = 1000);
+        private delegate T[] TestDataDelegate(int size, T min, T max, Comparison<T> comparer);
 
-        private readonly List<TestDataDelegate> _testData1 = new List<TestDataDelegate>
+        List<TestDataDelegate> firstTestData = new List<TestDataDelegate>
         {
-            Arrays.RandNum,
+            Arrays<T>.RandNum,
         };
 
-        private readonly List<TestDataDelegate> _testData2 = new List<TestDataDelegate>
+        List<TestDataDelegate> secondTestData = new List<TestDataDelegate>
         {
-            Arrays.SortArrays,
+            Arrays<T>.SortArrays,
         };
 
-        private readonly List<TestDataDelegate> _testData3 = new List<TestDataDelegate>
+        List<TestDataDelegate> thirdTestData = new List<TestDataDelegate>
         {
-            Arrays.PermutationArray
+            Arrays<T>.PermutationArray
         };
-
-        private readonly List<TestDataDelegate> _testData4 = new List<TestDataDelegate>
+        List<TestDataDelegate> fourthTestData = new List<TestDataDelegate>
         {
-            Arrays.ForwardSortArray,
+            Arrays<T>.ForwardSortArray,
         };
-
-        private readonly List<TestDataDelegate> _testData5 = new List<TestDataDelegate> 
+        List<TestDataDelegate> fifthTestData = new List<TestDataDelegate> 
         {
-            Arrays.ReverseSortArray
+            Arrays<T>.ReverseSortArray
         };
-
-        private readonly List<TestDataDelegate> _testData6 = new List<TestDataDelegate> 
+        List<TestDataDelegate> sixthTestData = new List<TestDataDelegate> 
         {
-            Arrays.ReplaceItemsArray
+            Arrays<T>.ReplaceElementsArray
         };
-
-        private readonly List<TestDataDelegate> _testData7 = new List<TestDataDelegate>
+        List<TestDataDelegate> seventhTestData = new List<TestDataDelegate>
         {
-            Arrays.RepeatItemArray
+            Arrays<T>.RepeatElArray
         };
 
 
-        private List<GroupDelegate> _groupDelegate = null;
-        private List<TestDataDelegate> _testDataDelegate = null;
-        private int _groupNumber = 0;
-        private int _testNumber = 0;
-        private int divisor = 1;
-        private int size = 10000;
+        List<GroupDelegate> groupDelegate = null;
+        List<TestDataDelegate> testDataDelegate = null;
+        int groupNumber = 0;
+        int testNumber = 0;
+        int divisor = 1;
+        int size = 10000;
 
-        [SuppressMessage("ReSharper.DPA", "DPA0000: DPA issues")]
-        public void InitialTest(int groupNumber, int testNumber)
+        public void InitialTest(int groupNumber_, int testNumber_, T min, T max, Comparison< T> comparer)
         {
-            _groupNumber = groupNumber + 1;
-            _testNumber = testNumber + 1;
+            groupNumber = groupNumber_ + 1;
+            testNumber = testNumber_ + 1;
             
-            switch (_groupNumber)
+            switch (groupNumber)
             {
                 case 1:
-                    _groupDelegate = new List<GroupDelegate>(_firstGroup);                   
+                    groupDelegate = new List<GroupDelegate>(firstGroup);                   
                     size = 10000;
                     break;
                 case 2:
-                    _groupDelegate = new List<GroupDelegate>(_secondGroup);
+                    groupDelegate = new List<GroupDelegate>(secondGroup);
                     size = 100000;
                     break;
                 case 3:
-                    _groupDelegate = new List<GroupDelegate>(_thirdGroup);
+                    groupDelegate = new List<GroupDelegate>(thirdGroup);
                     size = 1000000;
                     break;
                 default:
-                    _groupDelegate = new List<GroupDelegate>(_firstGroup);
+                    groupDelegate = new List<GroupDelegate>(firstGroup);
                     size = 10000;
                     break;
             }
-            switch (_testNumber)
+            switch (testNumber)
             {
                 case 1:
-                    _testDataDelegate = new List<TestDataDelegate>(_testData1);
+                    testDataDelegate = new List<TestDataDelegate>(firstTestData);
                     break;
                 case 2:
-                    _testDataDelegate = new List<TestDataDelegate>(_testData2);
+                    testDataDelegate = new List<TestDataDelegate>(secondTestData);
                     break;
                 case 3:
-                    _testDataDelegate = new List<TestDataDelegate>(_testData3);
+                    testDataDelegate = new List<TestDataDelegate>(thirdTestData);
                     break;
                 case 4:
-                    _testDataDelegate = new List<TestDataDelegate>(_testData4);
+                    testDataDelegate = new List<TestDataDelegate>(fourthTestData);
                     break;
                 case 5:
-                    _testDataDelegate = new List<TestDataDelegate>(_testData5);
+                    testDataDelegate = new List<TestDataDelegate>(fifthTestData);
                     break;
                 case 6:
-                    _testDataDelegate = new List<TestDataDelegate>(_testData6);
+                    testDataDelegate = new List<TestDataDelegate>(sixthTestData);
                     break;
                 case 7:
-                    _testDataDelegate = new List<TestDataDelegate>(_testData7);
+                    testDataDelegate = new List<TestDataDelegate>(seventhTestData);
                     break;
                 default:
-                    _testDataDelegate = new List<TestDataDelegate>(_testData1);
+                    testDataDelegate = new List<TestDataDelegate>(firstTestData);
                     divisor = 4;
                     break;
             }
             
-            GenerateArrays();
+            GenerateArrays(min, max, comparer);
         }
-        
-        private void GenerateArrays()
+
+        private void GenerateArrays(T min, T max, Comparison<T> comparer)
         {
-            switch (_testDataDelegate.Count)
+            switch (testDataDelegate.Count)
             {
                 case 1:
                 {
-                    _array1 = new int[(int)Math.Log(size, 10)][];
+                    array1 = new T[(int)Math.Log(size, 10)][];
                     var c = 0;
                     for (var i = 10; i < size + 1; i *= 10)
                     {
-                        _array1[c] = new int[i];
-                        _array1[c] = _testDataDelegate[0](ref i);
+                        array1[c] = new T[i];
+                        array1[c] = testDataDelegate[0](i, min, max, comparer);
                         c++;
                     }
 
@@ -163,22 +156,23 @@ namespace ConsoleApp1
                 }
                 case 4:
                 {
-                    _array1 = new int[(int)Math.Log(size, 10)][];
-                    _array2 = new int[(int)Math.Log(size, 10)][];
-                    _array3 = new int[(int)Math.Log(size, 10)][];
-                    _array4 = new int[(int)Math.Log(size, 10)][];
+                    array1 = new T[(int)Math.Log(size, 10)][];
+                    array2 = new T[(int)Math.Log(size, 10)][];
+                    array3 = new T[(int)Math.Log(size, 10)][];
+                    array4 = new T[(int)Math.Log(size, 10)][];
                     var c = 0;
+
                     for (var i = 10; i < size + 1; i *= 10)
                     {
-                        _array1[c] = new int[i];
-                        _array2[c] = new int[i];
-                        _array3[c] = new int[i];
-                        _array4[c] = new int[i];
+                        array1[c] = new T[i];
+                        array2[c] = new T[i];
+                        array3[c] = new T[i];
+                        array4[c] = new T[i];
 
-                        _array1[c] = _testDataDelegate[0](ref i);
-                        _array2[c] = _testDataDelegate[1](ref i);
-                        _array3[c] = _testDataDelegate[2](ref i);
-                        _array4[c] = _testDataDelegate[3](ref i);
+                        array1[c] = testDataDelegate[0](i, min, max, comparer);
+                        array2[c] = testDataDelegate[1](i, min, max, comparer);
+                        array3[c] = testDataDelegate[2](i, min, max, comparer);
+                        array4[c] = testDataDelegate[3](i, min, max, comparer);
 
                         c++;
                     }
@@ -187,23 +181,24 @@ namespace ConsoleApp1
                 }
             }
         }
-        public void StartTest()
+        
+        public void StartTest(Comparison<T> comparer)
         {
-            var x = new double[_array1.Length];
-            var y = new long[_groupDelegate.Count][];
+            var x = new double[array1.Length];
+            var y = new long[groupDelegate.Count][];
 
-            if (_groupDelegate == null) return;
-            switch (_testDataDelegate.Count)
+            if (groupDelegate == null) return;
+            switch (testDataDelegate.Count)
             {
                 case 1:
                 {
-                    for (var sortInd = 0; sortInd != _groupDelegate.Count; sortInd++)
+                    for (var sortInd = 0; sortInd != groupDelegate.Count; sortInd++)
                     {
-                        y[sortInd] = new long[_array1.Length];
-                        for (var i = 0; i < _array1.Length; i++)
+                        y[sortInd] = new long[array1.Length];
+                        for (var i = 0; i < array1.Length; i++)
                         {
                             {
-                                x[i] = _array1[i].Length;
+                                x[i] = array1[i].Length;
                                 long time = 0;
                                 var ind = sortInd;
                                 var i1 = i;
@@ -212,7 +207,7 @@ namespace ConsoleApp1
                                     var stopwatch = new Stopwatch();
                                     stopwatch.Start();
 
-                                    _groupDelegate[ind](_array1[i1]);
+                                    groupDelegate[ind](array1[i1], comparer);
 
                                     stopwatch.Stop();
                                     time += stopwatch.ElapsedMilliseconds;
@@ -222,7 +217,7 @@ namespace ConsoleApp1
                             }
                         }
                     }
-                    var graph = new ConsoleApp1.Graph(_groupNumber, _testNumber, size, x, y);
+                    var graph = new ConsoleApp1.Graph(groupNumber, testNumber, size, x, y);
                     graph.ShowDialog();
                     break;
                 }
